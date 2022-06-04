@@ -28,9 +28,14 @@ import argparse
 import os
 import sys
 from pathlib import Path
-
+import csv
 import torch
 import torch.backends.cudnn as cudnn
+
+
+with open('data.csv','w' ,encoding='utf-8',newline='') as csvFile:
+                          writer = csv.writer(csvFile)
+                          writer.writerow(['filename','xmin','ymin','xmax','ymax'])
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -129,7 +134,7 @@ def run(
 
         # Second-stage classifier (optional)
         # pred = utils.general.apply_classifier(pred, classifier_model, im, im0s)
-
+        
         # Process predictions
         for i, det in enumerate(pred):  # per image
             seen += 1
@@ -167,6 +172,22 @@ def run(
                         c = int(cls)  # integer class
                         label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
                         annotator.box_label(xyxy, label, color=colors(c, True))
+                        # xMin yMin xMax yMax
+                        csvRowList = []
+                        x1 = int(xyxy[0].item())
+                        y1 = int(xyxy[1].item())
+                        x2 = int(xyxy[2].item())
+                        y2 = int(xyxy[3].item())
+                        csvRowList = [str(p).split('/')[-1],x1,y1,x2,y2]
+                        with open('data.csv','a') as csvFile:
+                          writer = csv.writer(csvFile)
+                          writer.writerow(csvRowList)
+                        
+                        # confidence_score = conf
+                        # class_index = cls
+                        # object_name = names[int(cls)]
+
+                        print('bounding box is ', x1, y1, x2, y2)
                     if save_crop:
                         save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
 
@@ -250,3 +271,4 @@ def main(opt):
 if __name__ == "__main__":
     opt = parse_opt()
     main(opt)
+

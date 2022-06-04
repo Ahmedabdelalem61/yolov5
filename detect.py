@@ -35,7 +35,7 @@ import torch.backends.cudnn as cudnn
 
 with open('data.csv','w' ,encoding='utf-8',newline='') as csvFile:
                           writer = csv.writer(csvFile)
-                          writer.writerow(['filename','xmin','ymin','xmax','ymax','frame'])
+                          writer.writerow(['frame','xmin','ymin','xmax','ymax'])
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -178,7 +178,7 @@ def run(
                         y1 = int(xyxy[1].item())
                         x2 = int(xyxy[2].item())
                         y2 = int(xyxy[3].item())
-                        csvRowList = [str(p).split('/')[-1],x1,y1,x2,y2,frame]
+                        csvRowList = [frame,x1,y1,x2,y2]
                         with open('data.csv','a') as csvFile:
                           writer = csv.writer(csvFile)
                           writer.writerow(csvRowList)

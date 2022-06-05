@@ -32,8 +32,10 @@ import csv
 import torch
 import torch.backends.cudnn as cudnn
 
+# define the name of the directory to be created
 
-with open('data.csv','w' ,encoding='utf-8',newline='') as csvFile:
+
+with open('/content/yolov5/result/data/data.csv','w' ,encoding='utf-8',newline='') as csvFile:
                           writer = csv.writer(csvFile)
                           writer.writerow(['frame','xmin','ymin','xmax','ymax'])
 
@@ -178,14 +180,29 @@ def run(
                         y1 = int(xyxy[1].item())
                         x2 = int(xyxy[2].item())
                         y2 = int(xyxy[3].item())
+                        originalvideoSize = (375,1242)
+                        originalvideoHieght = originalvideoSize[0]
+                        originalvideoWidth = originalvideoSize[1]
+                        imgHeight = im0.shape[0]
+                        imgWidth = im0.shape[1]
+                        x1 = x1/imgWidth
+                        x2 = x2/imgWidth
+                        y1 = y1/imgHeight
+                        y2 = y2/imgHeight
+                        x1 = x1*originalvideoWidth
+                        x2 = x2*originalvideoWidth
+                        y1 = y1*originalvideoHieght
+                        y2 = y2*originalvideoHieght
                         csvRowList = [frame,x1,y1,x2,y2]
-                        with open('data.csv','a') as csvFile:
+                        with open('/content/yolov5/result/data/data.csv','a') as csvFile:
                           writer = csv.writer(csvFile)
                           writer.writerow(csvRowList)
                         
                         # confidence_score = conf
                         # class_index = cls
                         # object_name = names[int(cls)]
+                        original_img = im0
+                        cv2.imwrite('/content/yolov5/result/frames/{0}.png'.format(frame),im0)
 
                         print('bounding box is ', x1, y1, x2, y2,frame)
                     if save_crop:
@@ -271,4 +288,5 @@ def main(opt):
 if __name__ == "__main__":
     opt = parse_opt()
     main(opt)
+
 
